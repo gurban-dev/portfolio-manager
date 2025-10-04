@@ -1,7 +1,13 @@
 services:
-  web:
+  backend:
     build: ./backend
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    container_name: backend
+
+    # For local development as it reloads the code on changes:
+    command: python manage.py runserver 0.0.0.0:8000
+
+    # For production:
+    # command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./backend:/app
     ports:
