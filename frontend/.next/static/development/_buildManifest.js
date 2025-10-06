@@ -6,6 +6,13 @@ self.__BUILD_MANIFEST = {
   },
   "sortedPages": [
     "/_app",
-    "/_error"
+    "/_error",
+    "/accounts",
+    "/auth/login",
+    "/auth/register",
+    "/dashboard",
+    "/esg",
+    "/notifications",
+    "/transactions"
   ]
 };self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()

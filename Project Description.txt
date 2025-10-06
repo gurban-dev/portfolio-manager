@@ -1,0 +1,128 @@
+Personal Green Portfolio Manager
+
+A SaaS-style fintech app that:
+Aggregates investment data (simulated API or mock CSV uploads)
+
+Tracks performance and ESG impact
+
+Provides analytics and actionable insights
+
+Suggests sustainable investment adjustments
+
+Includes notifications and simple predictive forecasts
+
+Backend (Django + Django REST Framework)
+
+User management: Email authentication + optional OAuth, roles (user, admin)
+
+Investment models:
+
+Accounts (simulated banks/fintech apps)
+
+Transactions (amount, type, timestamp)
+
+ESG score (CO₂ impact, sustainability rating)
+
+Analytics engine:
+
+Portfolio performance over time
+
+ESG footprint calculation
+
+Risk/reward indicators
+
+Notifications & alerts: Portfolio rebalancing suggestions
+or thresholds
+
+Security & compliance: GDPR-compliant data handling, password
+hashing, CSRF protection
+
+Optional AI integration: Suggest personalized ESG investments
+using simple ML predictions
+
+Frontend (Next.js + TypeScript)
+
+Dashboard: Portfolio overview, ESG impact, performance charts
+
+Interactive charts: Recharts or Chart.js
+
+Transactions page: Filter, search, and upload CSV of transactions
+
+Notifications panel: Alerts for thresholds or investment suggestions
+
+Responsive design: TailwindCSS or MUI
+
+Advanced Features to Impress Recruiters
+
+Real-time updates via WebSockets/Django Channels
+
+PDF export of monthly reports
+
+Multi-currency support (EUR, NOK, SEK, GBP)
+
+Dockerized deployment on AWS/GCP
+
+CI/CD with GitHub Actions
+
+Unit & integration tests
+
+Goal:
+Allow users to track personal investments and ESG impact
+in one dashboard, analyze performance, get alerts, and
+receive recommendations.
+
+Tech Stack:
+Backend: Django + Django REST Framework, PostgreSQL
+
+Frontend: Next.js + TypeScript, TailwindCSS, Recharts/Chart.js
+
+DevOps: Docker, AWS (EC2 + RDS) / GCP, CI/CD with GitHub Actions
+
+Optional AI: Simple ML model for ESG investment recommendations
+
+
+Key Features:
+Multi-role authentication (user, admin)
+
+Transaction and portfolio tracking
+
+ESG analytics & visualization
+
+Notifications & alerts
+
+CSV import/export
+
+GDPR-compliant data handling
+
+Real-time dashboard updates (WebSockets optional)
+
+Multi-currency support
+
+Backend logic	Shows ability to handle financial calculations,
+transactions, multi-model databases
+
+Frontend & UX	Shows you can visualize complex data elegantly
+
+Security & compliance	GDPR + session auth demonstrates
+enterprise-readiness
+
+Cloud/DevOps	Docker + deployment = production-ready mindset
+
+Analytics/ML	Optional ESG recommendations = innovative, AI/ML exposure
+
+Cross-country relevance	Multi-currency & ESG focus = appealing
+in Nordic & EU markets
+
+Note: ESG investing is particularly strong in Norway, Finland,
+Germany, while Italy and Germany appreciate fintech apps that
+handle personal finance efficiently.
+
+5️⃣ Optional Bonus Twist
+
+Combine Greentech + Fintech:
+
+Users can track their financial return + environmental impact,
+e.g., how much CO₂ savings a portfolio generates.
+
+This signals innovation, societal impact, and technical breadth
+— highly attractive in Nordic and Central European markets.

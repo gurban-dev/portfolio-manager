@@ -1,0 +1,5 @@
+{
+  "/notifications": [
+    "./static/chunks/pages/notifications.js"
+  ]
+}
