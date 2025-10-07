@@ -10,7 +10,6 @@ self.__BUILD_MANIFEST = {
     "/accounts",
     "/auth/login",
     "/auth/register",
-    "/dashboard",
     "/esg",
     "/notifications",
     "/transactions"

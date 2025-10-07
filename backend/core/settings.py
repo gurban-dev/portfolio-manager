@@ -31,6 +31,27 @@ if env_origins:
 # Allow credentials for CORS
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF_TRUSTED_ORIGINS tells Django to trust
+# CSRF tokens from this frontend.
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+REST_FRAMEWORK = {
+    # Checks the user's session cookie (created when you
+    # log in through Django's authentication system).
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    # IsAuthenticated
+    # Only logged-in (authenticated) users can make API calls.
+    # Any request without valid authentication will get a 403
+    # Forbidden response.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
 # Application definition
 
 INSTALLED_APPS = [
