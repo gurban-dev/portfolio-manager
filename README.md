@@ -1,6 +1,8 @@
 To launch the project:
 
-docker compose up --build
+docker compose up --build --remove-orphans
+
+--remove-orphans removes the orphan containers.
 
 Integrating Tailwind CSS with Next.js:
 
@@ -223,3 +225,9 @@ app/
 ├─ profile/
 │  └─ [userId]/
 │     └─ page.tsx      → Route: `/profile/:userId` (dynamic route)
+
+Although not in frontend/app/page.tsx, the NotificationBell.tsx
+
+component is rendered because it is part of the Navbar.tsx component
+
+which is rendered in layout.tsx.

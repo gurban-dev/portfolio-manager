@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Account
+from .models import CustomUser, Account
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
   accounts = AccountSerializer(many=True, read_only=True)
 
   class Meta:
-    model = User
+    model = CustomUser
 
     fields = [
       'id',

@@ -1,20 +1,23 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { Bell, BellOff } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Bell } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 import { api } from '@/lib/api'
 
-interface Notification {
-  id: number
-  message: string
-  read: boolean
-}
-
 export default function NotificationBell() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
+  const { user, checked } = useAuth() // `checked` indicates auth check is done
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function fetchNotifications() {
+    // Only fetch notifications if user is logged in and auth check is done
+    if (!checked || !user) return
+
+    const fetchNotifications = async () => {
+      setLoading(true)
+
       try {
         // api is an Axios instance.
         /* ? separates the endpoint path from query parameters.
@@ -27,29 +30,42 @@ export default function NotificationBell() {
            are unread. */
         const res = await api.get('/notifications/?unread=true')
 
-        setNotifications(res.data)
-      } catch (error) {
-        console.error('Failed to fetch notifications', error)
+        setUnreadCount(res.data.length)
+      } catch (err: any) {
+        console.error('Failed to fetch notifications:', err)
+        setError('Unable to load notifications')
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchNotifications()
-  }, [])
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+    // Optional: setup polling or WebSocket for real-time notifications
+    // const interval = setInterval(fetchNotifications, 60000)
+    // return () => clearInterval(interval)
+  }, [user, checked])
+
+  // Render nothing if user not logged in
+  if (!checked || !user) return null
 
   return (
-    <button className="relative hover:opacity-80 transition">
-      {unreadCount > 0 ? (
-        <>
-          <Bell className="w-6 h-6 text-gray-700" />
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full px-1.5">
-            {unreadCount}
-          </span>
-        </>
-      ) : (
-        <BellOff className="w-6 h-6 text-gray-400" />
+    <div className="relative">
+      <Bell className="w-6 h-6 text-gray-700 hover:text-gray-900 cursor-pointer" />
+
+      {loading && (
+        <span className="absolute -top-1 -right-1 w-3 h-3 bg-gray-400 rounded-full animate-pulse" />
       )}
-    </button>
+
+      {unreadCount > 0 && !loading && (
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </span>
+      )}
+
+      {error && (
+        <p className="text-xs text-red-500 absolute mt-6">{error}</p>
+      )}
+    </div>
   )
 }

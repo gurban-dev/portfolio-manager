@@ -7,11 +7,7 @@ self.__BUILD_MANIFEST = {
   "sortedPages": [
     "/_app",
     "/_error",
-    "/accounts",
     "/auth/login",
-    "/auth/register",
-    "/esg",
-    "/notifications",
-    "/transactions"
+    "/auth/register"
   ]
 };self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()

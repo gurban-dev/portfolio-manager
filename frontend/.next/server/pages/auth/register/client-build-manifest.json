@@ -1,0 +1,5 @@
+{
+  "/auth/register": [
+    "./static/chunks/pages/auth/register.js"
+  ]
+}
