@@ -1,5 +1,7 @@
 Personal Green Portfolio Manager
 
+Project name: FinSight
+
 A SaaS-style fintech app that:
 Aggregates investment data (simulated API or mock CSV uploads)
 
