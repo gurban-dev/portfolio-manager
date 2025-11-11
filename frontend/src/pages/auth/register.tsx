@@ -7,7 +7,7 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await api.post('/auth/register/', form)
+    await api.post('/api/auth/registration/', form)
   }
 
   return (

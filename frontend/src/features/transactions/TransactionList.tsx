@@ -3,7 +3,7 @@ import { useFetch } from '@/hooks/useFetch'
 import { Transaction } from '@/lib/types'
 
 export default function TransactionList() {
-  const { data: transactions, loading, error } = useFetch<Transaction[]>('/transactions/')
+  const { data: transactions, loading, error } = useFetch<Transaction[]>('/api/v1/transactions/')
 
   if (loading) return <p>Loading transactions...</p>
   if (error) return <p>Error loading transactions.</p>

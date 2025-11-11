@@ -28,7 +28,7 @@ export default function NotificationBell() {
 
            true is the value — meaning: return only notifications that
            are unread. */
-        const res = await api.get('/notifications/?unread=true')
+        const res = await api.get('/api/v1/notifications/?unread=true')
 
         setUnreadCount(res.data.length)
       } catch (err: any) {

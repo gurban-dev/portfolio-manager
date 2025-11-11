@@ -28,17 +28,18 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-
   db:
-    image: postgres:15
+    image: postgres:16
+    container_name: greenportfolio_db
+    restart: always
     environment:
-      POSTGRES_DB: fintechdb
-      POSTGRES_USER: fintechuser
-      POSTGRES_PASSWORD: fintechpass
+      POSTGRES_DB: greenportfolio
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  pgdata:

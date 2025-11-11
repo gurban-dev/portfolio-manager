@@ -9,10 +9,10 @@ export function useAuth() {
 
   const fetchUser = async () => {
     try {
-      // Sends an HTTP GET request to your backend at the endpoint /users/me/.
+      // Sends an HTTP GET request to your backend at the endpoint /api/v1/users/me/.
 
       // This endpoint returns the currently authenticated user's data:
-      const res = await api.get('/users/me/')
+      const res = await api.get('/api/v1/users/me/')
 
       setUser(res.data)
     } catch {
@@ -36,13 +36,13 @@ export function useAuth() {
   }, [])
 
   const login = async (credentials: any) => {
-    await api.post('/auth/login/', credentials)
+    await api.post('/api/auth/login/', credentials)
 
     fetchUser()
   }
 
   const logout = async () => {
-    await api.post('/auth/logout/')
+    await api.post('/api/auth/logout/')
 
     setUser(null)
   }

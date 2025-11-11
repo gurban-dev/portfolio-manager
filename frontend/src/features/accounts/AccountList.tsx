@@ -4,7 +4,7 @@ import { Account } from '@/lib/types'
 import AccountCard from '@/components/AccountCard'
 
 export default function AccountList() {
-  const { data: accounts, loading, error } = useFetch<Account[]>('/accounts/')
+  const { data: accounts, loading, error } = useFetch<Account[]>('/api/v1/accounts/')
 
   if (loading) return <p>Loading accounts...</p>
   if (error) return <p>Error loading accounts.</p>

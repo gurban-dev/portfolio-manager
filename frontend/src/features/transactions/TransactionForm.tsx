@@ -13,7 +13,7 @@ export default function TransactionForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await api.post('/transactions/', form)
+    await api.post('/api/v1/transactions/', form)
     setForm({ account: '', amount: '', date: '', description: '', transaction_type: 'debit' })
   }
 

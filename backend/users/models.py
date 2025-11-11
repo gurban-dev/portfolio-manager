@@ -90,7 +90,10 @@ class ActivationToken(models.Model):
 
 
 class Account(models.Model):
-  user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='accounts')
+  user = models.ForeignKey(
+    settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='accounts'
+  )
+
   name = models.CharField(max_length=100)
   institution = models.CharField(max_length=100)
   balance = models.DecimalField(max_digits=15, decimal_places=2)

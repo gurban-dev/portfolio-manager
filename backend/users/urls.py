@@ -7,6 +7,4 @@ router.register(r'', UserViewSet, basename='user')
 
 urlpatterns = [
   path('', include(router.urls)),
-  path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
-  path("api/v1/auth/social/", include("allauth.socialaccount.urls")), 
 ]

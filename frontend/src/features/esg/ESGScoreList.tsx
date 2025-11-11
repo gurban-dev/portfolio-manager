@@ -3,7 +3,7 @@ import { useFetch } from '@/hooks/useFetch'
 import { ESGScore } from '@/lib/types'
 
 export default function ESGScoreList() {
-  const { data: scores, loading, error } = useFetch<ESGScore[]>('/esg/')
+  const { data: scores, loading, error } = useFetch<ESGScore[]>('/api/v1/investments/esg-scores/')
 
   if (loading) return <p>Loading ESG scores...</p>
   if (error) return <p>Error loading ESG scores.</p>

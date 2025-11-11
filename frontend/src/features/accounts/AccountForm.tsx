@@ -7,7 +7,7 @@ export default function AccountForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await api.post('/accounts/', form)
+    await api.post('/api/v1/accounts/', form)
     setForm({ name: '', institution: '', balance: '', currency: 'EUR' })
   }
 

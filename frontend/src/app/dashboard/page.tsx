@@ -34,8 +34,8 @@ export default function DashboardPage() {
     async function fetchData() {
       try {
         const [accountsRes, transactionsRes] = await Promise.all([
-          api.get('/accounts/'),
-          api.get('/transactions/?limit=5'),
+          api.get('/api/v1/accounts/'),
+          api.get('/api/v1/transactions/?limit=5'),
         ])
         setAccounts(accountsRes.data)
         setTransactions(transactionsRes.data.results || transactionsRes.data)

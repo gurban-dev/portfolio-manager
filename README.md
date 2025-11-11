@@ -8,6 +8,30 @@ Integrating Tailwind CSS with Next.js:
 
 https://tailwindcss.com/docs/installation/framework-guides/nextjs
 
+Create the virtual environment:
+python3 -m venv .venv
+
+Activate the virtual environment:
+. ./.venv/bin/activate
+
+source ./.venv/bin/activate
+
+To see the relational database tables:
+docker compose up -d db
+
+docker exec -it greenportfolio_db psql -U user -d greenportfolio
+
+\dt
+
+The frontend and backend directories should both have their own
+Dockerfile.
+
+The root folder of the entire project should contain one
+docker-compose.yml file.
+
+To generate the SECRET_KEY for JWT:
+python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+
 🧩 A. Authentication Workflow
 1. User Registration
 
@@ -27,13 +51,29 @@ Response includes confirmation or JWT/session token.
 
 (Option 2) Google OAuth2:
 
-User clicks “Sign in with Google”
+User clicks "Sign in with Google"
 
 Redirects to Google consent screen → returns access token
 
 Backend exchanges token → authenticates/creates user
 
 Returns JWT/session to frontend.
+
+Create a requirements directory inside the Django project's
+root folder. Then create a base.txt file inside for the core
+dependencies used everywhere (Development, Production, Testing).
+
+pip install -r requirements/base.txt
+
+dj-rest-auth is a Django package that provides ready-made REST
+API endpoints for authentication.
+
+[with_social] includes the:
+# Base package
+dj-rest-auth==5.0.2
+
+# Extra dependencies:
+django-allauth>=0.57.0 
 
 2. Login
 

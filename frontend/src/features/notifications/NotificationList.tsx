@@ -3,7 +3,7 @@ import { useFetch } from '@/hooks/useFetch'
 import { Notification } from '@/lib/types'
 
 export default function NotificationList() {
-  const { data: notifications, loading, error } = useFetch<Notification[]>('/notifications/')
+  const { data: notifications, loading, error } = useFetch<Notification[]>('/api/v1/notifications/')
 
   if (loading) return <p>Loading notifications...</p>
   if (error) return <p>Error loading notifications.</p>
