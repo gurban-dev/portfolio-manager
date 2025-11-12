@@ -11,16 +11,24 @@ export function GoogleLoginButton() {
   const [error, setError] = useState<string | null>(null);
 
   const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
+    flow: 'auth-code',
+    ux_mode: 'redirect',
+    redirect_uri: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+    onSuccess: async (codeResponse) => {
+      console.log('✅ Google OAuth success — codeResponse:', codeResponse);
+
       setIsLoading(true);
       setError(null);
 
       try {
-        const { user, created } = await authService.loginWithGoogle(
-          tokenResponse.access_token
+        // Send the authorization code to your backend
+        const { user, created } = await authService.loginWithGoogleAuthCode(
+          codeResponse.code
         );
 
         console.log('Login successful:', user);
+
+        console.log('✅ Backend response:', { user, created });
         
         // Redirect to dashboard
         router.push('/dashboard');
@@ -30,13 +38,23 @@ export function GoogleLoginButton() {
           console.log('Welcome! Your account has been created.');
         }
       } catch (err: any) {
+        console.error('❌ Backend error:', err);
+
+        if (err.response) {
+          console.error('Response data:', err.response.data);
+          console.error('Response status:', err.response.status);
+        }
+
         setError(err.message || 'Failed to login with Google');
         console.error('Google login error:', err);
       } finally {
+        console.log('ℹ️ Google login process finished');
+
         setIsLoading(false);
       }
     },
-    onError: () => {
+    onError: (errorResponse) => {
+      console.error('❌ Google OAuth client error:', errorResponse);
       setError('Google login was cancelled or failed');
     },
   });
@@ -46,7 +64,7 @@ export function GoogleLoginButton() {
       <button
         onClick={() => googleLogin()}
         disabled={isLoading}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />

@@ -48,11 +48,30 @@ export const authService = {
     }
   },
 
-  // Google OAuth login
+  // Google OAuth login (popup flow)
   async loginWithGoogle(googleAccessToken: string) {
     try {
+      console.log('In authService.ts');
+
       const response = await axios.post(`${API_URL}/api/auth/google/`, {
         access_token: googleAccessToken,
+      });
+
+      const { access, refresh, user } = response.data;
+      
+      this.setTokens({ access, refresh });
+      
+      return { user, created: response.data.created };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Google login failed');
+    }
+  },
+
+  // Google OAuth login (redirect-based auth-code flow)
+  async loginWithGoogleAuthCode(authCode: string) {
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/google/`, {
+        code: authCode,
       });
 
       const { access, refresh, user } = response.data;

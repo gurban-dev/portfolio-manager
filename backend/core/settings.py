@@ -145,17 +145,9 @@ INSTALLED_APPS = [
 SITE_ID = 1  # Required for django-allauth
 
 # Email settings
-ACCOUNT_LOGIN_METHODS = {"email"}
-
-ACCOUNT_SIGNUP_FIELDS = {
-	"email": {"required": True},
-	"username": {"required": False},
-	"password1": {"required": True},
-	"password2": {"required": True}
-}
-
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_UNIQUE_EMAIL = True
 
@@ -210,6 +202,9 @@ DATABASES = {
 
 		# The container name from docker compose.
 		"HOST": "greenportfolio_db",
+
+		# "HOST": "localhost",
+
 		"PORT": 5432
 	}
 }

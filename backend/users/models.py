@@ -53,7 +53,26 @@ class CustomUser(AbstractUser):
 
   role = models.CharField(max_length=10, choices=role_choices, default='user')
 
-  preferred_currency = models.CharField(max_length=3, default='EUR')
+  # Add these fields that the serializer expects:
+  preferred_currency = models.CharField(
+    max_length=3,
+    choices=[('EUR', 'Euro'), ('NOK', 'Norwegian Krone'), 
+             ('SEK', 'Swedish Krona'), ('GBP', 'British Pound'),
+             ('USD', 'United States Dollar'), ('CHF', 'Swiss Franc')],
+    default='EUR'
+  )
+
+  risk_tolerance = models.CharField(
+    max_length=20,
+    choices=[('conservative', 'Conservative'), 
+              ('moderate', 'Moderate'), 
+              ('aggressive', 'Aggressive')],
+    default='moderate'
+  )
+
+  esg_preference = models.IntegerField(default=70)
+
+  created_at = models.DateTimeField(default=timezone.now)
 
   USERNAME_FIELD = 'email_address'
   REQUIRED_FIELDS = ['first_name', 'last_name']
