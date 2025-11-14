@@ -11,7 +11,6 @@ urlpatterns = [
   
   # Google OAuth
   path('api/auth/google/', google_login, name='google_login'),
-  path('api/auth/google/callback/', google_login_callback, name='google_callback'),
   
   # Social auth URLs (django-allauth)
   path('accounts/', include('allauth.urls')),

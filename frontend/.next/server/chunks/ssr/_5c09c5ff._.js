@@ -193,8 +193,6 @@ function AuthCallbackPage() {
                 } else {
                     console.log('ℹ️ No state parameter (optional)');
                 }
-                const decodedCode = decodeURIComponent(code);
-                console.log('decodedCode:', decodedCode);
                 // Send the code to your backend.
                 const { user, created } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2f$authService$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["authService"].loginWithGoogleAuthCode(code);
                 console.log('✅ Login successful:', user);
@@ -223,7 +221,7 @@ function AuthCallbackPage() {
                         className: "w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 77,
+                        lineNumber: 73,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -231,18 +229,18 @@ function AuthCallbackPage() {
                         children: "Authenticating with Google..."
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 78,
+                        lineNumber: 74,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/auth/callback/page.tsx",
-                lineNumber: 76,
+                lineNumber: 72,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/auth/callback/page.tsx",
-            lineNumber: 75,
+            lineNumber: 71,
             columnNumber: 7
         }, this);
     }
@@ -257,7 +255,7 @@ function AuthCallbackPage() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 88,
+                        lineNumber: 84,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -266,18 +264,18 @@ function AuthCallbackPage() {
                         children: "Back to Login"
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 89,
+                        lineNumber: 85,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/auth/callback/page.tsx",
-                lineNumber: 87,
+                lineNumber: 83,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/auth/callback/page.tsx",
-            lineNumber: 86,
+            lineNumber: 82,
             columnNumber: 7
         }, this);
     }

@@ -4,4 +4,6 @@ Enable account login without Google.
 
 Build login features.
 
+Use Celery or another async task queue to send emails in the background.
+
 Add routing for About, Contact, and Pricing.

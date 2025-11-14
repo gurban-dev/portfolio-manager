@@ -3,11 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import redirect
 from django.core.mail import EmailMessage
-from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from django.views.decorators.csrf import csrf_exempt
-from allauth.socialaccount.models import SocialToken, SocialAccount
 from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
@@ -18,7 +15,7 @@ import requests
 import json
 from .models import CustomUser
 from .serializers import UserSerializer
-
+from .models import EmailVerification
 import logging
 
 logger = logging.getLogger(__name__)
@@ -60,50 +57,51 @@ def generate_activation_token():
 	# (can adjust length).
   return secrets.token_urlsafe(32)
 
-def send_verification_code(email_address: str):
+def email_verification_code(user: CustomUser):
 	"""
 	Endpoint to send a verification email to the user.
 	Expects JSON payload with 'emailAddress' key.
 	"""
 
-	activation_token = str(generate_activation_token())
+	# Generate and save token
+	token = EmailVerification.generate_token()
+	EmailVerification.objects.create(user=user, token=token)
+
+	if not user.email_address:
+		logger.warning("Verification email request missing 'email' field.")
+
+		return JsonResponse(
+			{'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST
+		)
+
+	email_body = (
+		f'<p style="font-size: 1.2rem;">'
+		f'Click on the subsequent link to confirm your Cognitia sign up: <br>'
+		f'http://localhost:5173/confirm-email/{activation_token}'
+		f'</p>'
+	)
+
+	# Compose the email.
+	email = EmailMessage(
+		subject='Sign in to Cognitia',
+		body=email_body,
+		from_email='team.cognitia.ai@gmail.com',
+		to=[user.email_address],
+		headers={'X-Custom-Header': 'CognitiaVerification'}
+	)
+
+	# This way the font size of values assigned
+	# to body can be larger.
+	email.content_subtype = "html"
 
 	try:
-		# -Check if the following condition is even necessary.
-		if not email_address:
-			logger.warning("Verification email request missing 'email' field.")
-
-			return JsonResponse(
-				{'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST
-			)
-
-		email_body = (
-			f'<p style="font-size: 1.2rem;">'
-			f'Click on the subsequent link to confirm your Cognitia sign up: <br>'
-			f'http://localhost:5173/confirm-email/{activation_token}'
-			f'</p>'
-		)
-
-		# Compose the email.
-		email = EmailMessage(
-			subject='Sign in to Cognitia',
-			body=email_body,
-			from_email='team.cognitia.ai@gmail.com',
-			to=[email_address],
-			headers={'X-Custom-Header': 'CognitiaVerification'}
-		)
-
-		# This way the font size of values assigned
-		# to body can be larger.
-		email.content_subtype = "html"
-
 		# Send the email asynchronously in production
 		# (example: using Celery).
 		email.send(fail_silently=False)
 
 		# create_user_if_not_exists(email_address, activation_token)
 
-		logger.info(f"Sent verification email to {email_address}")
+		logger.info(f"Sent verification email to {user.email_address}")
 
 		return JsonResponse(
 			{'message': 'Verification email sent successfully'},
@@ -263,6 +261,10 @@ def google_login_callback(request):
 
 		user, created = get_or_create_user_from_google_access_token(access_token)
 
+		# If the user was just created, send the verification email.
+		if created and not user.email_verified:
+			email_verification_code(user)
+
 		refresh = RefreshToken.for_user(user)
 
 		# Return JWT tokens
@@ -296,3 +298,19 @@ def validate_google_token(request):
 			return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
 
 	return JsonResponse({'detail': 'Method not allowed.'}, status=405)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def verify_email(request, token):
+	try:
+		verification = EmailVerification.objects.get(token=token, is_used=False)
+		user = verification.user
+		user.email_verified = True
+		user.save()
+		verification.is_used = True
+		verification.save()
+
+		# Optionally redirect to frontend login or dashboard
+		return redirect(f"{settings.FRONTEND_URL}/auth/login/")
+	except EmailVerification.DoesNotExist:
+		return Response({'error': 'Invalid or expired token'}, status=400)

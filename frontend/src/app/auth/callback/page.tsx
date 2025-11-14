@@ -45,10 +45,6 @@ export default function AuthCallbackPage() {
           console.log('ℹ️ No state parameter (optional)');
         }
 
-        const decodedCode = decodeURIComponent(code);
-
-        console.log('decodedCode:', decodedCode);
-
         // Send the code to your backend.
         const { user, created } = await authService.loginWithGoogleAuthCode(code);
 

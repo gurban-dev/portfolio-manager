@@ -12,6 +12,11 @@ Activate the virtual environment:
 
 source ./.venv/bin/activate
 
+To make migrations inside the Docker container:
+docker compose exec backend python manage.py makemigrations
+
+docker compose exec backend python manage.py migrate
+
 To see the relational database tables:
 docker compose up -d db
 
@@ -72,6 +77,14 @@ Redirects to Google consent screen → returns access token
 Backend exchanges token → authenticates/creates user
 
 Returns JWT/session to frontend.
+
+Flow summary
+
+User logs in via Google → backend checks if user exists.
+
+If new, email_verified=False → backend sends verification email.
+
+User clicks the email link → /verify-email/<token>/ → sets email_verified=True.
 
 Create a requirements directory inside the Django project's
 root folder. Then create a base.txt file inside for the core

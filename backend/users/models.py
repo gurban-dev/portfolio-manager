@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
 from django.utils import timezone
+import secrets
 
 
 class CustomUserManager(BaseUserManager):
@@ -48,6 +49,8 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
   email_address = models.EmailField(unique=True)
+
+  email_verified = models.BooleanField(default=False)
 
   role_choices = [('user', 'User'), ('admin', 'Admin')]
 
@@ -106,6 +109,17 @@ class ActivationToken(models.Model):
 	def mark_used(self):
 		self.used = True
 		self.save()
+
+
+class EmailVerification(models.Model):
+  user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+  token = models.CharField(max_length=64, unique=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  is_used = models.BooleanField(default=False)
+
+  @staticmethod
+  def generate_token():
+    return secrets.token_urlsafe(32)
 
 
 class Account(models.Model):
