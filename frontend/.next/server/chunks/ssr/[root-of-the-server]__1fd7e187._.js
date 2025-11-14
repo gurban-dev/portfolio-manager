@@ -31,7 +31,7 @@ var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
 [__TURBOPACK__imported__module__$5b$externals$5d2f$axios__$5b$external$5d$__$28$axios$2c$__esm_import$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
 ;
 const api = __TURBOPACK__imported__module__$5b$externals$5d2f$axios__$5b$external$5d$__$28$axios$2c$__esm_import$29$__["default"].create({
-    baseURL: ("TURBOPACK compile-time value", "http://localhost:8000/api/v1") || 'http://localhost:8000/api',
+    baseURL: ("TURBOPACK compile-time value", "http://localhost:8000") || 'http://localhost:8000',
     /* withCredentials: true ensures that session cookies
      are sent to Django with every request. */ withCredentials: true
 });
@@ -60,9 +60,9 @@ function useAuth() {
     const [checked, setChecked] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(false);
     const fetchUser = async ()=>{
         try {
-            // Sends an HTTP GET request to your backend at the endpoint /users/me/.
+            // Sends an HTTP GET request to your backend at the endpoint /api/v1/users/me/.
             // This endpoint returns the currently authenticated user's data:
-            const res = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].get('/users/me/');
+            const res = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].get('/api/v1/users/me/');
             setUser(res.data);
         } catch  {
             setUser(null);
@@ -81,11 +81,11 @@ function useAuth() {
         fetchUser();
     }, []);
     const login = async (credentials)=>{
-        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].post('/auth/login/', credentials);
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].post('/api/auth/login/', credentials);
         fetchUser();
     };
     const logout = async ()=>{
-        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].post('/auth/logout/');
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].post('/api/auth/logout/');
         setUser(null);
     };
     return {

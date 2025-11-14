@@ -38,10 +38,10 @@ const authService = {
             return false;
         }
     },
-    // Google OAuth login (popup flow)
+    // Google OAuth login
     async loginWithGoogle (googleAccessToken) {
         try {
-            console.log('In authService.ts');
+            console.log('In lib/auth/authService.ts loginWithGoogle() googleAccessToken:', googleAccessToken);
             const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post("".concat(API_URL, "/api/auth/google/"), {
                 access_token: googleAccessToken
             });
@@ -62,7 +62,7 @@ const authService = {
     // Google OAuth login (redirect-based auth-code flow)
     async loginWithGoogleAuthCode (authCode) {
         try {
-            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post("".concat(API_URL, "/api/auth/google/"), {
+            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post("".concat(API_URL, "/api/auth/google/callback/"), {
                 code: authCode
             });
             const { access, refresh, user } = response.data;
@@ -180,16 +180,35 @@ function AuthCallbackPage() {
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "AuthCallbackPage.useEffect": ()=>{
+            if ("TURBOPACK compile-time truthy", 1) {
+                console.log("Callback URL in browser:", window.location.href);
+            }
             const handleCallback = {
                 "AuthCallbackPage.useEffect.handleCallback": async ()=>{
                     try {
+                        // Null check.
+                        if (!searchParams) {
+                            throw new Error('Search parameters not available');
+                        } else {
+                            console.log('searchParams.toString():', searchParams.toString());
+                        }
                         const code = searchParams.get('code');
-                        const state = searchParams.get('state');
                         if (!code) {
                             throw new Error('No authorization code received from Google');
+                        } else {
+                            console.log('✅ Authorization code received:', code);
                         }
-                        console.log('✅ Authorization code received:', code);
-                        // Send the code to your backend
+                        const state = searchParams.get('state');
+                        // State is optional - just log if present.
+                        if (state) {
+                            console.log('📋 State parameter:', state);
+                        // Optionally verify state matches what you sent
+                        } else {
+                            console.log('ℹ️ No state parameter (optional)');
+                        }
+                        const decodedCode = decodeURIComponent(code);
+                        console.log('decodedCode:', decodedCode);
+                        // Send the code to your backend.
                         const { user, created } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2f$authService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authService"].loginWithGoogleAuthCode(code);
                         console.log('✅ Login successful:', user);
                         // Redirect to dashboard
@@ -219,7 +238,7 @@ function AuthCallbackPage() {
                         className: "w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 48,
+                        lineNumber: 77,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -227,18 +246,18 @@ function AuthCallbackPage() {
                         children: "Authenticating with Google..."
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 49,
+                        lineNumber: 78,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/auth/callback/page.tsx",
-                lineNumber: 47,
+                lineNumber: 76,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/auth/callback/page.tsx",
-            lineNumber: 46,
+            lineNumber: 75,
             columnNumber: 7
         }, this);
     }
@@ -253,27 +272,27 @@ function AuthCallbackPage() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 59,
+                        lineNumber: 88,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: ()=>router.push('/auth'),
-                        className: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700",
+                        className: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer",
                         children: "Back to Login"
                     }, void 0, false, {
                         fileName: "[project]/src/app/auth/callback/page.tsx",
-                        lineNumber: 60,
+                        lineNumber: 89,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/auth/callback/page.tsx",
-                lineNumber: 58,
+                lineNumber: 87,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/auth/callback/page.tsx",
-            lineNumber: 57,
+            lineNumber: 86,
             columnNumber: 7
         }, this);
     }

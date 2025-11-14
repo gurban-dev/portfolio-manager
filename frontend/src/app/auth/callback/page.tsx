@@ -6,23 +6,50 @@ import { authService } from '@/lib/auth/authService';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
+
   const searchParams = useSearchParams();
+
   const [error, setError] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log("Callback URL in browser:", window.location.href);
+    }
+
     const handleCallback = async () => {
       try {
+        // Null check.
+        if (!searchParams) {
+          throw new Error('Search parameters not available');
+        }else{
+          console.log('searchParams.toString():', searchParams.toString());
+        }
+
         const code = searchParams.get('code');
-        const state = searchParams.get('state');
 
         if (!code) {
           throw new Error('No authorization code received from Google');
+        }else{
+          console.log('✅ Authorization code received:', code);
         }
 
-        console.log('✅ Authorization code received:', code);
+        const state = searchParams.get('state');
 
-        // Send the code to your backend
+        // State is optional - just log if present.
+        if (state) {
+          console.log('📋 State parameter:', state);
+          // Optionally verify state matches what you sent
+        } else {
+          console.log('ℹ️ No state parameter (optional)');
+        }
+
+        const decodedCode = decodeURIComponent(code);
+
+        console.log('decodedCode:', decodedCode);
+
+        // Send the code to your backend.
         const { user, created } = await authService.loginWithGoogleAuthCode(code);
 
         console.log('✅ Login successful:', user);
@@ -31,7 +58,9 @@ export default function AuthCallbackPage() {
         router.push('/dashboard');
       } catch (err: any) {
         console.error('❌ Authentication error:', err);
+
         setError(err.message || 'Authentication failed');
+
         setLoading(false);
       }
     };
@@ -59,7 +88,7 @@ export default function AuthCallbackPage() {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => router.push('/auth')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
           >
             Back to Login
           </button>

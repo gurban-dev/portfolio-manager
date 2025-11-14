@@ -1,4 +1,7 @@
 self.__BUILD_MANIFEST = {
+  "/auth/login": [
+    "./static/chunks/pages/auth/login.js"
+  ],
   "__rewrites": {
     "afterFiles": [],
     "beforeFiles": [],

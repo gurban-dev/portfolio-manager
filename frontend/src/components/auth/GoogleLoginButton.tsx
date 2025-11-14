@@ -29,7 +29,7 @@ export function GoogleLoginButton() {
         console.log('Login successful:', user);
 
         console.log('✅ Backend response:', { user, created });
-        
+
         // Redirect to dashboard
         router.push('/dashboard');
         
@@ -64,7 +64,13 @@ export function GoogleLoginButton() {
       <button
         onClick={() => googleLogin()}
         disabled={isLoading}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="
+          w-full flex items-center justify-center
+          gap-3 px-4 py-3 bg-white border border-gray-300
+          rounded-lg hover:bg-gray-50 transition-colors
+          cursor-pointer disabled:opacity-50
+          disabled:cursor-not-allowed
+        "
       >
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />

@@ -17,7 +17,7 @@ export default function LandingPage() {
         backdrop-blur-md
       ">
         <h1 className="text-2xl font-bold text-slate-800">
-          FinSightt
+          FinSight
         </h1>
 
         <div className="flex gap-4">

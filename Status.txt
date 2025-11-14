@@ -1,7 +1,7 @@
-Add routing for About, Contact, and Pricing.
-
-Build sign up and login features.
-
 Authenticate through clicking a link sent via email.
 
-Enable Google account login.
+Enable account login without Google.
+
+Build login features.
+
+Add routing for About, Contact, and Pricing.

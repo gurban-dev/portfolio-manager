@@ -74,6 +74,9 @@ CSRF_TRUSTED_ORIGINS = [
   "http://localhost:3000",
 ]
 
+# The second argument is the fallback value if the variable is not set.
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 # Google OAuth Settings.
 SOCIALACCOUNT_PROVIDERS = {
 	'google': {

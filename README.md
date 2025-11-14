@@ -4,10 +4,6 @@ docker compose up --build --remove-orphans
 
 --remove-orphans removes the orphan containers.
 
-Integrating Tailwind CSS with Next.js:
-
-https://tailwindcss.com/docs/installation/framework-guides/nextjs
-
 Create the virtual environment:
 python3 -m venv .venv
 
@@ -22,6 +18,24 @@ docker compose up -d db
 docker exec -it greenportfolio_db psql -U user -d greenportfolio
 
 \dt
+
+Launch the Django shell inside the Docker container to see
+the current CustomUser objects:
+docker compose exec backend python manage.py shell
+
+from django.contrib.auth import get_user_model
+
+get_user_model() returns the CustomUser class defined in backend/users/models.py
+because of the following line in backend/core/settings.py:
+AUTH_USER_MODEL = 'users.CustomUser'
+
+User = get_user_model()
+
+List all CustomUser objects.
+User.objects.all()
+
+Check a specific email
+User.objects.filter(email='dennisgurban44@gmail.com')
 
 The frontend and backend directories should both have their own
 Dockerfile.

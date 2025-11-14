@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from django.views.decorators.csrf import csrf_exempt
 from allauth.socialaccount.models import SocialToken, SocialAccount
 from rest_framework import status
@@ -129,8 +130,13 @@ def google_login(request):
 		"access_token": "google_access_token_here"
 	}
 	"""
-	access_token = request.data.get('access_token')
-	
+
+	print('In users/views.py google_login() request.data:', request.data)
+
+	access_token = request.data.get('code')
+
+	print('In users/views.py google_login() access_token:', access_token)
+
 	if not access_token:
 		return Response(
 			{'error': 'Access token is required'},
@@ -151,6 +157,7 @@ def google_login(request):
 			)
 		
 		google_data = google_response.json()
+
 		email = google_data.get('email')
 		
 		if not email:
@@ -184,29 +191,25 @@ def google_login(request):
 			status=status.HTTP_500_INTERNAL_SERVER_ERROR
 		)
 
-# @login_required
-# def google_login_callback(request):
-# 	user = request.user
+def get_or_create_user_from_google_access_token(access_token):
+	# Use access_token to fetch Google profile
+	response = requests.get(
+		'https://www.googleapis.com/oauth2/v2/userinfo',
+		headers={'Authorization': f'Bearer {access_token}'}
+	)
 
-# 	social_accounts = SocialAccount.objects.filter(user=user)
-# 	print("Social Account for user:", social_accounts)
+	profile = response.json()
 
-# 	social_account = social_accounts.first()
+	# Create or fetch user in your DB
+	user, created = User.objects.get_or_create(
+		email=profile['email'],
+		defaults={
+			'first_name': profile.get('given_name', ''),
+			'last_name': profile.get('family_name', ''),
+		}
+	)
 
-# 	if not social_account:
-# 		print("No social account for user:", user)
-# 		return redirect('http://localhost:5173/login/callback/?error=NoSocialAccount')
-
-# 	token = SocialToken.objects.filter(account=social_account, account__provider='google').first()
-
-# 	if token:
-# 		print('Google token found:', token.token)
-# 		refresh = RefreshToken.for_user(user)
-# 		access_token = str(refresh.access_token)
-# 		return redirect(f'http://localhost:5173/login/callback/?access_token={access_token}')
-# 	else:
-# 		print('No Google token found for user', user)
-# 		return redirect(f'http://localhost:5173/login/callback/?error=NoGoogleToken')
+	return user, created
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -222,13 +225,15 @@ def google_login_callback(request):
 	from django.conf import settings
 	
 	code = request.data.get('code')
+
+	print('code:', code)
 	
 	if not code:
 		return Response(
 			{'error': 'Authorization code is required'},
 			status=status.HTTP_400_BAD_REQUEST
 		)
-	
+
 	try:
 		# Exchange code for access token
 		token_response = requests.post(
@@ -241,21 +246,32 @@ def google_login_callback(request):
 				'grant_type': 'authorization_code'
 			}
 		)
-		
+
 		if token_response.status_code != 200:
 			return Response(
 				{'error': 'Failed to exchange code for token'},
 				status=status.HTTP_400_BAD_REQUEST
 			)
-		
+
 		token_data = token_response.json()
+
+		print('token_data:', token_data)
+
 		access_token = token_data.get('access_token')
-		
-		# Now use the access token to get user info
-		return google_login(request._request.__class__(
-			data={'access_token': access_token}
-		))
-			
+
+		print('access_token:', access_token)
+
+		user, created = get_or_create_user_from_google_access_token(access_token)
+
+		refresh = RefreshToken.for_user(user)
+
+		# Return JWT tokens
+		return Response({
+			'user': UserSerializer(user).data,
+			'access': str(refresh.access_token),
+			'refresh': str(refresh),
+			'created': created
+		})
 	except Exception as e:
 		return Response(
 			{'error': str(e)},
