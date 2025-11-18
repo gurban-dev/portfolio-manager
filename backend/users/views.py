@@ -63,9 +63,9 @@ def email_verification_code(user: CustomUser):
 	Expects JSON payload with 'emailAddress' key.
 	"""
 
-	# Generate and save token
-	token = EmailVerification.generate_token()
-	EmailVerification.objects.create(user=user, token=token)
+	# Generate and save the activation token.
+	activation_token = EmailVerification.generate_token()
+	EmailVerification.objects.create(user=user, token=activation_token)
 
 	if not user.email_address:
 		logger.warning("Verification email request missing 'email' field.")
@@ -76,18 +76,18 @@ def email_verification_code(user: CustomUser):
 
 	email_body = (
 		f'<p style="font-size: 1.2rem;">'
-		f'Click on the subsequent link to confirm your Cognitia sign up: <br>'
+		f'Click on the subsequent link to confirm your Greenfolio sign up: <br>'
 		f'http://localhost:5173/confirm-email/{activation_token}'
 		f'</p>'
 	)
 
 	# Compose the email.
 	email = EmailMessage(
-		subject='Sign in to Cognitia',
+		subject='Sign in to Greenfolio',
 		body=email_body,
-		from_email='team.cognitia.ai@gmail.com',
+		from_email='team.greenfolio@gmail.com',
 		to=[user.email_address],
-		headers={'X-Custom-Header': 'CognitiaVerification'}
+		headers={'X-Custom-Header': 'GreenfolioVerification'}
 	)
 
 	# This way the font size of values assigned
