@@ -34,7 +34,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
   serializer_class = UserSerializer
 
-  print('UserViewSet in backend/users/views.py line 21.')
+  print('backend/users/views.py UserViewSet')
 
   def get_permissions(self):
     if self.action in ['list', 'create', 'destroy', 'update', 'partial_update']:
@@ -49,6 +49,7 @@ class UserViewSet(viewsets.ModelViewSet):
   def me(self, request):
     """Get current logged-in user profile"""
     serializer = self.get_serializer(request.user)
+
     return Response(serializer.data)
 
 # Nonce
@@ -65,6 +66,7 @@ def email_verification_code(user: CustomUser):
 
 	# Generate and save the activation token.
 	activation_token = EmailVerification.generate_token()
+
 	EmailVerification.objects.create(user=user, token=activation_token)
 
 	if not user.email_address:
@@ -260,6 +262,12 @@ def google_login_callback(request):
 		print('access_token:', access_token)
 
 		user, created = get_or_create_user_from_google_access_token(access_token)
+
+		print('user:', user)
+
+		print('user.email_verified:', user.email_verified)
+
+		print('created:', created)
 
 		# If the user was just created, send the verification email.
 		if created and not user.email_verified:

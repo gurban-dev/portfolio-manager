@@ -70,6 +70,10 @@ export const authService = {
   // Google OAuth login (redirect-based auth-code flow)
   async loginWithGoogleAuthCode(authCode: string) {
     try {
+      const url = `${API_URL}/api/auth/google/callback/`;
+
+      console.log('src/lib/auth/authService.ts loginWithGoogleAuthCode() Calling URL:', url);
+
       const response = await axios.post(`${API_URL}/api/auth/google/callback/`, {
         code: authCode,
       });
@@ -80,7 +84,9 @@ export const authService = {
       
       return { user, created: response.data.created };
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Google login failed');
+      console.log('src/lib/auth/authService.ts typeof error:', typeof error);
+
+      throw new Error(error || 'Google login failed');
     }
   },
 

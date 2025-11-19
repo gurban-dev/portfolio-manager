@@ -60,6 +60,8 @@ const authService = {
     // Google OAuth login (redirect-based auth-code flow)
     async loginWithGoogleAuthCode (authCode) {
         try {
+            const url = `${API_URL}/api/auth/google/callback/`;
+            console.log('src/lib/auth/authService.ts loginWithGoogleAuthCode() Calling URL:', url);
             const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].post(`${API_URL}/api/auth/google/callback/`, {
                 code: authCode
             });
@@ -73,7 +75,8 @@ const authService = {
                 created: response.data.created
             };
         } catch (error) {
-            throw new Error(error.response?.data?.error || 'Google login failed');
+            console.log('src/lib/auth/authService.ts typeof error:', typeof error);
+            throw new Error(error || 'Google login failed');
         }
     },
     // Traditional email/password login

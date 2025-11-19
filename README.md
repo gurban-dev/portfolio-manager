@@ -24,6 +24,16 @@ docker exec -it greenportfolio_db psql -U user -d greenportfolio
 
 \dt
 
+To quit:
+\q
+
+To see the records in one of the database tables:
+docker exec -it greenportfolio_db bash
+
+root@794246267d6c:/# psql -U user -d greenportfolio
+
+SELECT * FROM users_customuser;
+
 Launch the Django shell inside the Docker container to see
 the current CustomUser objects:
 docker compose exec backend python manage.py shell
