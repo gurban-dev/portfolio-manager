@@ -1,6 +1,9 @@
 from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .models import ESGScore
 from .serializers import ESGScoreSerializer
+from .recommendations import get_esg_recommendations
 
 
 class ESGScoreViewSet(viewsets.ModelViewSet):
@@ -20,3 +23,11 @@ class ESGScoreViewSet(viewsets.ModelViewSet):
       from rest_framework.exceptions import PermissionDenied
       raise PermissionDenied("Cannot create ESG score for this transaction")
     serializer.save()
+
+  @action(detail=False, methods=['get'])
+  def recommendations(self, request):
+    """
+    Get ESG investment recommendations for the current user.
+    """
+    recommendations = get_esg_recommendations(request.user)
+    return Response({'recommendations': recommendations})

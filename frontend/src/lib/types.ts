@@ -37,7 +37,39 @@ export interface ESGScore {
 export interface Notification {
   id: number
   user: number | User
+  title?: string
   message: string
+  notification_type?: string
+  link?: string | null
   created_at: string
   is_read: boolean
+}
+
+export interface PerformanceDataPoint {
+  date: string
+  value: number
+}
+
+export interface PerformanceResponse {
+  currency: string
+  series: PerformanceDataPoint[]
+}
+
+export interface ESGDataPoint {
+  date: string
+  co2_kg: number
+  rating: number
+}
+
+export interface ESGResponse {
+  series: ESGDataPoint[]
+  total_co2_kg: number
+  avg_rating: number
+}
+
+export interface RiskMetrics {
+  risk_score: number
+  expected_return: number
+  sharpe_ratio: number
+  volatility: number
 }

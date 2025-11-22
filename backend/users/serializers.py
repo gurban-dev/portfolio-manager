@@ -6,6 +6,9 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
   """Serializer for user details"""
+  # Map API 'email' to CustomUser.email_address
+  email = serializers.EmailField(source='email_address', read_only=True)
+
   class Meta:
     model = User
 
@@ -30,15 +33,24 @@ class CustomRegisterSerializer(RegisterSerializer):
   last_name = serializers.CharField(required=False, allow_blank=True)
 
   preferred_currency = serializers.ChoiceField(
-    choices=['EUR', 'NOK', 'SEK', 'GBP'],
+    choices=['EUR', 'NOK', 'SEK', 'GBP', 'USD', 'CHF'],
     default='EUR'
   )
+
+  risk_tolerance = serializers.ChoiceField(
+    choices=['conservative', 'moderate', 'aggressive'],
+    default='moderate', required=False
+  )
+
+  esg_preference = serializers.IntegerField(default=70, required=False)
   
   def get_cleaned_data(self):
     data = super().get_cleaned_data()
     data['first_name'] = self.validated_data.get('first_name', '')
     data['last_name'] = self.validated_data.get('last_name', '')
     data['preferred_currency'] = self.validated_data.get('preferred_currency', 'EUR')
+    data['risk_tolerance'] = self.validated_data.get('risk_tolerance', 'moderate')
+    data['esg_preference'] = self.validated_data.get('esg_preference', 70)
     return data
   
   def save(self, request):
@@ -46,6 +58,14 @@ class CustomRegisterSerializer(RegisterSerializer):
       user.first_name = self.cleaned_data.get('first_name', '')
       user.last_name = self.cleaned_data.get('last_name', '')
       user.preferred_currency = self.cleaned_data.get('preferred_currency', 'EUR')
+      # Set additional preferences
+      user.risk_tolerance = self.cleaned_data.get('risk_tolerance', 'moderate')
+      user.esg_preference = self.cleaned_data.get('esg_preference', 70)
+      # Ensure CustomUser.email_address is populated
+      if hasattr(user, 'email_address'):
+        if not user.email_address:
+          # dj-rest-auth/allauth provides 'email' in cleaned data
+          user.email_address = self.cleaned_data.get('email', getattr(user, 'email', ''))
       user.save()
       return user
 

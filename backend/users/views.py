@@ -119,24 +119,43 @@ def email_verification_code(user: CustomUser):
 
 User = get_user_model()
 
+# Optional access-token login is removed to reduce ambiguity.
+# Frontend should use the auth-code flow via google_login_callback.
+
+def get_or_create_user_from_google_access_token(access_token):
+	# Use access_token to fetch Google profile
+	response = requests.get(
+		'https://www.googleapis.com/oauth2/v2/userinfo',
+		headers={'Authorization': f'Bearer {access_token}'}
+	)
+
+	profile = response.json()
+
+	# Create or fetch user in your DB
+	# CustomUser uses email_address, not email
+	user, created = User.objects.get_or_create(
+		email_address=profile['email'],
+		defaults={
+			'first_name': profile.get('given_name', ''),
+			'last_name': profile.get('family_name', ''),
+		}
+	)
+
+	return user, created
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def google_login(request):
 	"""
-	Handle Google OAuth login
+	Handle Google OAuth login with access token
 	
 	Expected payload:
 	{
 		"access_token": "google_access_token_here"
 	}
 	"""
-
-	print('In users/views.py google_login() request.data:', request.data)
-
-	access_token = request.data.get('code')
-
-	print('In users/views.py google_login() access_token:', access_token)
-
+	access_token = request.data.get('access_token')
+	
 	if not access_token:
 		return Response(
 			{'error': 'Access token is required'},
@@ -144,39 +163,12 @@ def google_login(request):
 		)
 	
 	try:
-		# Verify token with Google
-		google_response = requests.get(
-			'https://www.googleapis.com/oauth2/v3/userinfo',
-			headers={'Authorization': f'Bearer {access_token}'}
-		)
+		user, created = get_or_create_user_from_google_access_token(access_token)
 		
-		if google_response.status_code != 200:
-			return Response(
-				{'error': 'Invalid Google access token'},
-				status=status.HTTP_401_UNAUTHORIZED
-			)
+		# If the user was just created, send the verification email.
+		if created and not user.email_verified:
+			email_verification_code(user)
 		
-		google_data = google_response.json()
-
-		email = google_data.get('email')
-		
-		if not email:
-			return Response(
-				{'error': 'Email not provided by Google'},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		
-		# Get or create user
-		user, created = User.objects.get_or_create(
-			email=email,
-			defaults={
-				'username': email.split('@')[0],
-				'first_name': google_data.get('given_name', ''),
-				'last_name': google_data.get('family_name', ''),
-			}
-		)
-		
-		# Generate JWT tokens
 		refresh = RefreshToken.for_user(user)
 		
 		return Response({
@@ -190,26 +182,6 @@ def google_login(request):
 			{'error': str(e)},
 			status=status.HTTP_500_INTERNAL_SERVER_ERROR
 		)
-
-def get_or_create_user_from_google_access_token(access_token):
-	# Use access_token to fetch Google profile
-	response = requests.get(
-		'https://www.googleapis.com/oauth2/v2/userinfo',
-		headers={'Authorization': f'Bearer {access_token}'}
-	)
-
-	profile = response.json()
-
-	# Create or fetch user in your DB
-	user, created = User.objects.get_or_create(
-		email=profile['email'],
-		defaults={
-			'first_name': profile.get('given_name', ''),
-			'last_name': profile.get('family_name', ''),
-		}
-	)
-
-	return user, created
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -318,7 +290,7 @@ def verify_email(request, token):
 		verification.is_used = True
 		verification.save()
 
-		# Optionally redirect to frontend login or dashboard
-		return redirect(f"{settings.FRONTEND_URL}/auth/login/")
+		# Redirect to the frontend verification success route
+		return redirect(f"{settings.FRONTEND_URL}/auth?verified=1")
 	except EmailVerification.DoesNotExist:
 		return Response({'error': 'Invalid or expired token'}, status=400)

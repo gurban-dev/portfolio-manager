@@ -5,10 +5,12 @@ from datetime import timedelta
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR set to backend/core; project root is one level up
 BASE_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = BASE_DIR.parent
 
-# Load the .env file.
-load_dotenv(BASE_DIR / '.env')
+# Load environment from backend/.env (project root for backend)
+load_dotenv(PROJECT_ROOT / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-change-in-production-12345')
@@ -127,6 +129,7 @@ INSTALLED_APPS = [
 	'rest_framework.authtoken',
 	'rest_framework_simplejwt',
 	'corsheaders',
+	'channels',
 
 	# Authentication.
 	'django.contrib.sites',
@@ -141,16 +144,18 @@ INSTALLED_APPS = [
 	"users",
 	"transactions",
 	"investments",
-	"notifications"
+	"notifications",
+	"analytics",
+	"reports",
 ]
 
 # Django-allauth settings
 SITE_ID = 1  # Required for django-allauth
 
 # Email settings
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_UNIQUE_EMAIL = True
 
@@ -189,6 +194,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -240,6 +246,18 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+# Channels config (Redis layer)
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
+CHANNEL_LAYERS = {
+	'default': {
+		'BACKEND': 'channels_redis.core.RedisChannelLayer',
+		'CONFIG': {
+			'hosts': [(REDIS_HOST, REDIS_PORT)],
+		},
+	},
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

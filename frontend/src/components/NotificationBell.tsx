@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { Bell } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { api } from '@/lib/api'
+import { useWebSocket } from '@/hooks/useWebSocket'
+import { WEBSOCKET_URL } from '@/lib/constants'
 
 export default function NotificationBell() {
   const { user, checked } = useAuth() // `checked` indicates auth check is done
@@ -11,40 +13,45 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const fetchNotifications = async () => {
+    if (!checked || !user) return
+    
+    setLoading(true)
+
+    try {
+      const res = await api.get('/api/v1/notifications/?unread=true')
+      setUnreadCount(res.data.length || 0)
+      setError(null)
+    } catch (err: any) {
+      console.error('Failed to fetch notifications:', err)
+      setError('Unable to load notifications')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     // Only fetch notifications if user is logged in and auth check is done
     if (!checked || !user) return
 
-    const fetchNotifications = async () => {
-      setLoading(true)
-
-      try {
-        // api is an Axios instance.
-        /* ? separates the endpoint path from query parameters.
-
-           unread=true is a key-value pair:
-
-           unread is the name of the filter parameter the backend expects.
-
-           true is the value — meaning: return only notifications that
-           are unread. */
-        const res = await api.get('/api/v1/notifications/?unread=true')
-
-        setUnreadCount(res.data.length)
-      } catch (err: any) {
-        console.error('Failed to fetch notifications:', err)
-        setError('Unable to load notifications')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchNotifications()
 
-    // Optional: setup polling or WebSocket for real-time notifications
-    // const interval = setInterval(fetchNotifications, 60000)
-    // return () => clearInterval(interval)
+    // Set up polling as fallback
+    const interval = setInterval(fetchNotifications, 60000)
+    return () => clearInterval(interval)
   }, [user, checked])
+
+  // WebSocket for real-time notifications
+  const wsUrl = user ? `${WEBSOCKET_URL}${user.id}/` : null
+  useWebSocket(wsUrl || '', {
+    onMessage: (data) => {
+      // When a new notification arrives via WebSocket, refresh the count
+      if (data.message && user) {
+        fetchNotifications()
+      }
+    },
+    reconnect: true,
+  })
 
   // Render nothing if user not logged in
   if (!checked || !user) return null

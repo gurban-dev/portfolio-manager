@@ -1,10 +1,1 @@
-{
-  "/accounts/page": "app/accounts/page.js",
-  "/auth/callback/page": "app/auth/callback/page.js",
-  "/auth/page": "app/auth/page.js",
-  "/esg/page": "app/esg/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/notifications/page": "app/notifications/page.js",
-  "/page": "app/page.js",
-  "/transactions/page": "app/transactions/page.js"
-}
+{}
