@@ -286,6 +286,8 @@ Pytest + Jest tests	Quality + CI readiness
 PostgreSQL	Industry-standard persistence
 Vercel + Render or Fly.io	Modern, scalable hosting setup
 
+Remember that Next.js components need to have the first letter of
+their file names capitalised.
 
 Next.js App Router
 app/
