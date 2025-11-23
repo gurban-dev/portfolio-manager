@@ -3,19 +3,25 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import { authService } from '@/lib/auth/authService';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function GoogleLoginButton() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log('GoogleLoginButton mounted!');
+  }, []);
+
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
     ux_mode: 'redirect',
     redirect_uri: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+    
+    // onSuccess won't run with ux_mode: 'redirect' mode.
     onSuccess: async (codeResponse) => {
-      console.log('✅ Google OAuth success — codeResponse:', codeResponse);
+      console.log('Google OAuth success — codeResponse:', codeResponse);
 
       setIsLoading(true);
       setError(null);
@@ -28,17 +34,19 @@ export function GoogleLoginButton() {
 
         console.log('Login successful:', user);
 
-        console.log('✅ Backend response:', { user, created });
+        console.log('Backend response:', { user, created });
 
         // Redirect to dashboard
         router.push('/dashboard');
-        
+
+        console.log('42 in frontend/src/components/auth/GoogleLoginButton.tsx')
+
         if (created) {
           // Show welcome message for new users
           console.log('Welcome! Your account has been created.');
         }
       } catch (err: any) {
-        console.error('❌ Backend error:', err);
+        console.error('Backend error:', err);
 
         if (err.response) {
           console.error('Response data:', err.response.data);
@@ -46,15 +54,17 @@ export function GoogleLoginButton() {
         }
 
         setError(err.message || 'Failed to login with Google');
+
         console.error('Google login error:', err);
       } finally {
-        console.log('ℹ️ Google login process finished');
+        console.log('Google login process finished');
 
         setIsLoading(false);
       }
     },
     onError: (errorResponse) => {
-      console.error('❌ Google OAuth client error:', errorResponse);
+      console.error('Google OAuth client error:', errorResponse);
+
       setError('Google login was cancelled or failed');
     },
   });

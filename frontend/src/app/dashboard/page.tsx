@@ -12,6 +12,7 @@ import RiskRewardCard from '@/components/dashboard/RiskRewardCard'
 import { usePerformanceAnalytics, useESGAnalytics } from '@/hooks/useAnalytics'
 import { subDays, format } from 'date-fns'
 import { Account, Transaction, RiskMetrics } from '@/lib/types'
+import ReportGenerator from '@/components/reports/ReportGenerator'
 
 export default function DashboardPage() {
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -27,15 +28,23 @@ export default function DashboardPage() {
   const { data: esgData, loading: esgLoading } = useESGAnalytics(startDate, endDate, 'daily')
 
   useEffect(() => {
+    console.log('DashboardPage mounted.');
+
     async function fetchData() {
       try {
         const [accountsRes, transactionsRes, riskRes] = await Promise.all([
           api.get('/api/v1/accounts/'),
+
           api.get('/api/v1/transactions/?limit=5'),
-          api.get('/api/v1/analytics/risk/').catch(() => null), // Risk endpoint may not exist yet
+
+          // Risk endpoint may not exist yet.
+          api.get('/api/v1/analytics/risk/').catch(() => null),
         ])
+
         setAccounts(accountsRes.data)
+
         setTransactions(transactionsRes.data.results || transactionsRes.data)
+
         if (riskRes?.data) {
           setRiskMetrics(riskRes.data)
         }
@@ -70,7 +79,9 @@ export default function DashboardPage() {
         <h2 className="text-xl font-medium mb-4">Your Accounts</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
           {accounts.map((acc) => (
-            <AccountCard key={acc.id} account={acc} />
+            <AccountCard
+              key={acc.id}
+              account={{ ...acc, balance: acc.balance.toString() }} />
           ))}
         </div>
       </section>
@@ -138,7 +149,14 @@ export default function DashboardPage() {
       {/* Recent Transactions */}
       <section>
         <h2 className="text-xl font-medium mb-4">Recent Transactions</h2>
-        <TransactionTable transactions={transactions} />
+        <TransactionTable
+          transactions={
+            transactions.map(t => ({
+              ...t,
+              amount: t.amount.toString(),
+              category: t.category ?? undefined
+            }))}
+        />
       </section>
     </div>
   )

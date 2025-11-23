@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton';
@@ -14,6 +14,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log('LoginPage mounted!');
+  }, []);
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -21,6 +25,7 @@ export default function LoginPage() {
 
     try {
       await authService.login(email, password);
+
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed');

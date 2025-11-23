@@ -4,6 +4,10 @@ docker compose up --build --remove-orphans
 
 --remove-orphans removes the orphan containers.
 
+By default, when you build a Docker image, it contains
+
+a snapshot of your code at build time.
+
 Create the virtual environment:
 python3 -m venv .venv
 

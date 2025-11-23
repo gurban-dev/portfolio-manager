@@ -1,0 +1,2 @@
+Google callback does not execute onSuccess due to
+the redirect setting.

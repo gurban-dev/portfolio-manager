@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/lib/auth/authService';
 
-export default function AuthCallbackPage() {
+export default function GoogleCallbackPage() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -15,7 +15,7 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      console.log("Callback URL in browser:", window.location.href);
+      console.log("src/app/auth/callback/page.tsx window.location.href:", window.location.href);
     }
 
     const handleCallback = async () => {
@@ -32,28 +32,35 @@ export default function AuthCallbackPage() {
         if (!code) {
           throw new Error('No authorization code received from Google');
         }else{
-          console.log('✅ Authorization code received:', code);
+          console.log('Authorization code received:', code);
         }
 
         const state = searchParams.get('state');
 
         // State is optional - just log if present.
         if (state) {
-          console.log('📋 State parameter:', state);
+          console.log('State parameter:', state);
           // Optionally verify state matches what you sent
         } else {
-          console.log('ℹ️ No state parameter (optional)');
+          console.log('No state parameter (optional)');
         }
 
+        // Exchange code for JWT.
         // Send the code to your backend.
         const { user, created } = await authService.loginWithGoogleAuthCode(code);
 
-        console.log('✅ Login successful:', user);
+        console.log('src/app/auth/callback Login successful:', user);
+
+        // if (window.opener && code) {
+        //   // Send the code to the parent window.
+        //   window.opener.postMessage({ type: 'google-auth-code', code }, window.location.origin);
+        //   window.close();
+        // }
 
         // Redirect to dashboard
         router.push('/dashboard');
       } catch (err: any) {
-        console.error('❌ Authentication error:', err);
+        console.error('Authentication error:', err);
 
         setError(err.message || 'Authentication failed');
 

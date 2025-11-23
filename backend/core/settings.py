@@ -76,6 +76,12 @@ CSRF_TRUSTED_ORIGINS = [
   "http://localhost:3000",
 ]
 
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SECURE = True
+
 # The second argument is the fallback value if the variable is not set.
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
@@ -101,7 +107,7 @@ REST_FRAMEWORK = {
 	# Checks the user's session cookie (created when you
 	# log in through Django's authentication system).
 	"DEFAULT_AUTHENTICATION_CLASSES": [
-		'rest_framework.authentication.SessionAuthentication',
+		# 'rest_framework.authentication.SessionAuthentication',
 		'rest_framework_simplejwt.authentication.JWTAuthentication'
 	],
 

@@ -45,9 +45,13 @@ class ESGView(APIView):
 
 
 class RiskView(APIView):
+    print('backend/analytics/views.py RiskView')
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        print('request.user.is_authenticated:', request.user.is_authenticated)
+
         metrics = calculate_risk_metrics(request.user)
         serializer = RiskMetricsSerializer(data=metrics)
         serializer.is_valid(raise_exception=True)

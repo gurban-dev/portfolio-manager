@@ -15,10 +15,15 @@ class AccountViewSet(viewsets.ModelViewSet):
   Accounts are linked to users.
   Users can only see their own accounts.
   """
+
+  print('backend/transactions/views.py AccountViewSet')
+
   serializer_class = AccountSerializer
   permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
+    print('self.request.user.is_authenticated:', self.request.user.is_authenticated)
+
     return Account.objects.filter(user=self.request.user)
 
   def perform_create(self, serializer):
@@ -30,10 +35,15 @@ class TransactionViewSet(viewsets.ModelViewSet):
   Transactions belong to accounts.
   Users can only see transactions for accounts they own.
   """
+
+  print('backend/transactions/views.py TransactionViewSet')
+
   serializer_class = TransactionSerializer
   permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
+    print('self.request.user.is_authenticated:', self.request.user.is_authenticated)
+
     return Transaction.objects.filter(account__user=self.request.user)
 
   def perform_create(self, serializer):

@@ -51,7 +51,7 @@ export const authService = {
   // Google OAuth login
   async loginWithGoogle(googleAccessToken: string) {
     try {
-      console.log('In lib/auth/authService.ts loginWithGoogle() googleAccessToken:', googleAccessToken);
+      console.log('In src/lib/auth/authService.ts loginWithGoogle() googleAccessToken:', googleAccessToken);
 
       const response = await axios.post(`${API_URL}/api/auth/google/`, {
         access_token: googleAccessToken,
@@ -70,19 +70,20 @@ export const authService = {
   // Google OAuth login (redirect-based auth-code flow)
   async loginWithGoogleAuthCode(authCode: string) {
     try {
-      const url = `${API_URL}/api/auth/google/callback/`;
-
-      console.log('src/lib/auth/authService.ts loginWithGoogleAuthCode() Calling URL:', url);
-
       const response = await axios.post(`${API_URL}/api/auth/google/callback/`, {
         code: authCode,
       });
+    
+      const { access, refresh } = response.data;
 
-      const { access, refresh, user } = response.data;
+      // Set cookie for middleware detection
+      const decoded: any = jwtDecode(access);
+      const expires = new Date(decoded.exp * 1000).toUTCString();
+      document.cookie = `auth-token=${access}; Path=/; Expires=${expires}; SameSite=Lax;`;
 
       this.setTokens({ access, refresh });
-      
-      return { user, created: response.data.created };
+    
+      return { user: response.data.user, created: response.data.created };
     } catch (error: any) {
       console.log('src/lib/auth/authService.ts typeof error:', typeof error);
 
