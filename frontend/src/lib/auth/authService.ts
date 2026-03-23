@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { API_URL } from '@/lib/env';
 
 interface AuthTokens {
   access: string;
@@ -48,18 +47,35 @@ export const authService = {
     }
   },
 
+  extractTokens(payload: Record<string, unknown>): AuthTokens {
+    const access = String(payload.access ?? payload.access_token ?? '');
+    const refresh = String(payload.refresh ?? payload.refresh_token ?? '');
+
+    if (!access || !refresh) {
+      throw new Error('Authentication response is missing tokens');
+    }
+
+    return { access, refresh };
+  },
+
+  persistSession(accessToken: string) {
+    const decoded: any = jwtDecode(accessToken);
+    const expires = new Date(decoded.exp * 1000).toUTCString();
+    document.cookie = `auth-token=${accessToken}; Path=/; Expires=${expires}; SameSite=Lax;`;
+  },
+
   // Google OAuth login
   async loginWithGoogle(googleAccessToken: string) {
     try {
-      console.log('In src/lib/auth/authService.ts loginWithGoogle() googleAccessToken:', googleAccessToken);
-
       const response = await axios.post(`${API_URL}/api/auth/google/`, {
         access_token: googleAccessToken,
       });
 
-      const { access, refresh, user } = response.data;
+      const { access, refresh } = this.extractTokens(response.data);
+      const { user } = response.data;
       
       this.setTokens({ access, refresh });
+      this.persistSession(access);
       
       return { user, created: response.data.created };
     } catch (error: any) {
@@ -74,20 +90,13 @@ export const authService = {
         code: authCode,
       });
     
-      const { access, refresh } = response.data;
-
-      // Set cookie for middleware detection
-      const decoded: any = jwtDecode(access);
-      const expires = new Date(decoded.exp * 1000).toUTCString();
-      document.cookie = `auth-token=${access}; Path=/; Expires=${expires}; SameSite=Lax;`;
-
+      const { access, refresh } = this.extractTokens(response.data);
       this.setTokens({ access, refresh });
+      this.persistSession(access);
     
       return { user: response.data.user, created: response.data.created };
     } catch (error: any) {
-      console.log('src/lib/auth/authService.ts typeof error:', typeof error);
-
-      throw new Error(error || 'Google login failed');
+      throw new Error(error.response?.data?.error || 'Google login failed');
     }
   },
 
@@ -99,9 +108,11 @@ export const authService = {
         password,
       });
 
-      const { access_token, refresh_token, user } = response.data;
+      const { access, refresh } = this.extractTokens(response.data);
+      const { user } = response.data;
       
-      this.setTokens({ access: access_token, refresh: refresh_token });
+      this.setTokens({ access, refresh });
+      this.persistSession(access);
       
       return { user };
     } catch (error: any) {
@@ -118,9 +129,11 @@ export const authService = {
         password2,
       });
 
-      const { access_token, refresh_token, user } = response.data;
+      const { access, refresh } = this.extractTokens(response.data);
+      const { user } = response.data;
       
-      this.setTokens({ access: access_token, refresh: refresh_token });
+      this.setTokens({ access, refresh });
+      this.persistSession(access);
       
       return { user };
     } catch (error: any) {
@@ -141,6 +154,7 @@ export const authService = {
       console.error('Logout error:', error);
     } finally {
       this.clearTokens();
+      document.cookie = 'auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax;';
     }
   },
 

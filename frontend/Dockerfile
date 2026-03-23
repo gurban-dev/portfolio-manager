@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Stage 2: Builder
 FROM node:18-alpine AS builder
@@ -57,4 +57,3 @@ ENV HOSTNAME "0.0.0.0"
 
 # Start Next.js server
 CMD ["node", "server.js"]
-

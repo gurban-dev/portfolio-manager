@@ -1,9 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 from users.views import google_login, google_login_callback
+from .views import health_check
 
 urlpatterns = [
   path('admin/', admin.site.urls),
+  path('health/', health_check, name='health'),
 
   # Standard authentication (dj-rest-auth)
   path('api/auth/', include('dj_rest_auth.urls')),

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { api } from '@/lib/api'
+import { authService } from '@/lib/auth/authService'
+import { User } from '@/lib/types'
 
 export function useAuth() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   // Indicates auth check done.
   const [checked, setChecked] = useState(false)
@@ -40,27 +42,12 @@ export function useAuth() {
   }, [])
 
   const login = async (credentials: any) => {
-    // Persist tokens so subsequent API calls (and WS auth) work reliably.
-    const res = await api.post('/api/auth/login/', credentials)
-    const access = res.data?.access_token
-    const refresh = res.data?.refresh_token
-
-    if (typeof window !== 'undefined' && access && refresh) {
-      localStorage.setItem('access_token', access)
-      localStorage.setItem('refresh_token', refresh)
-    }
-
+    await authService.login(credentials.email, credentials.password)
     fetchUser()
   }
 
   const logout = async () => {
-    await api.post('/api/auth/logout/')
-
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-    }
-
+    await authService.logout()
     setUser(null)
   }
 

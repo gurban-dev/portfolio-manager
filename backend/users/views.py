@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from datetime import datetime
 import secrets
 import requests
@@ -34,9 +35,6 @@ class UserViewSet(viewsets.ModelViewSet):
   queryset = CustomUser.objects.all()
 
   serializer_class = UserSerializer
-
-  print('backend/users/views.py UserViewSet')
-
   def get_permissions(self):
     if self.action in ['list', 'create', 'destroy', 'update', 'partial_update']:
       permission_classes = [permissions.IsAdminUser]
@@ -215,8 +213,10 @@ def get_or_create_user_from_google_access_token(access_token):
 	# Use access_token to fetch Google profile
 	response = requests.get(
 		'https://www.googleapis.com/oauth2/v2/userinfo',
-		headers={'Authorization': f'Bearer {access_token}'}
+		headers={'Authorization': f'Bearer {access_token}'},
+		timeout=10,
 	)
+	response.raise_for_status()
 
 	profile = response.json()
 
@@ -283,11 +283,7 @@ def google_login_callback(request):
 		"code": "authorization_code_from_google"
 	}
 	"""
-	from django.conf import settings
-	
 	code = request.data.get('code')
-
-	print('code:', code)
 	
 	if not code:
 		return Response(
@@ -305,7 +301,8 @@ def google_login_callback(request):
 				'client_secret': settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['secret'],
 				'redirect_uri': f"{settings.FRONTEND_URL}/auth/callback",
 				'grant_type': 'authorization_code'
-			}
+			},
+			timeout=10,
 		)
 
 		if token_response.status_code != 200:
@@ -316,19 +313,9 @@ def google_login_callback(request):
 
 		token_data = token_response.json()
 
-		print('token_data:', token_data)
-
 		access_token = token_data.get('access_token')
 
-		print('access_token:', access_token)
-
 		user, created = get_or_create_user_from_google_access_token(access_token)
-
-		print('user:', user)
-
-		print('user.email_verified:', user.email_verified)
-
-		print('created:', created)
 
 		# If the user was just created, send the verification email.
 		if created and not user.email_verified:
@@ -356,8 +343,6 @@ def validate_google_token(request):
 			data = json.loads(request.body)
 
 			google_access_token = data.get('access_token')
-
-			print(google_access_token)
 
 			if not google_access_token:
 				return JsonResponse({'detail': 'Access Token is missing.'}, status=400)
