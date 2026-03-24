@@ -88,34 +88,39 @@ jobs:
         flags: backend
         name: backend-coverage
 
-  frontend-lint:
+  frontend-checks:
     runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v4
     
+    - name: Set up pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.32.1
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: ./frontend/package.json
+        cache: 'pnpm'
+        cache-dependency-path: ./frontend/pnpm-lock.yaml
 
     - name: Install dependencies
       working-directory: ./frontend
-      run: npm install
+      run: pnpm install --frozen-lockfile
 
     - name: Run linter
       working-directory: ./frontend
-      run: npm run lint
+      run: pnpm lint
 
     - name: Run typecheck
       working-directory: ./frontend
-      run: npm run typecheck
+      run: pnpm typecheck
     
     - name: Build
       working-directory: ./frontend
-      run: npm run build
+      run: pnpm build
       env:
         NEXT_PUBLIC_API_URL: http://localhost:8000
         NEXT_PUBLIC_WS_URL: ws://localhost:8000/ws/notifications/

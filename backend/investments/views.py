@@ -1,9 +1,16 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from .models import ESGScore
 from .serializers import ESGScoreSerializer
 from .recommendations import get_esg_recommendations
+
+
+class ESGScorePagination(PageNumberPagination):
+  page_size = 20
+  page_size_query_param = 'page_size'
+  max_page_size = 100
 
 
 class ESGScoreViewSet(viewsets.ModelViewSet):
@@ -13,6 +20,7 @@ class ESGScoreViewSet(viewsets.ModelViewSet):
   """
   serializer_class = ESGScoreSerializer
   permission_classes = [permissions.IsAuthenticated]
+  pagination_class = ESGScorePagination
 
   def get_queryset(self):
     return ESGScore.objects.filter(transaction__account__user=self.request.user)

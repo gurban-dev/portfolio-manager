@@ -16,8 +16,8 @@ class CustomUserManager(BaseUserManager):
 
     user = self.model(
       email_address=email_address,
-      first_name=first_name,
-      last_name=last_name
+      first_name=first_name or '',
+      last_name=last_name or ''
     )
 
     if password:

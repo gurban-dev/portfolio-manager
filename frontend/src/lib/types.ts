@@ -4,6 +4,8 @@ export interface User {
   email: string
   role: 'user' | 'admin'
   preferred_currency: string
+  risk_tolerance: 'conservative' | 'moderate' | 'aggressive'
+  esg_preference: number
   accounts?: Account[]
 }
 

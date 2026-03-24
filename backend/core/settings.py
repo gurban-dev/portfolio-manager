@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -17,6 +18,7 @@ def env_bool(name: str, default: bool = False) -> bool:
 
 DEBUG = env_bool("DEBUG", False)
 ENVIRONMENT = os.getenv("DJANGO_ENV", "development")
+RUNNING_TESTS = "pytest" in " ".join(sys.argv) or "PYTEST_CURRENT_TEST" in os.environ
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
@@ -164,7 +166,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
-if os.getenv("DATABASE_URL"):
+use_postgres = os.getenv("DATABASE_URL") and not RUNNING_TESTS and not env_bool("USE_SQLITE", False)
+
+if use_postgres:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

@@ -1,6 +1,8 @@
 import ESGScoreList from '@/features/esg/ESGScoreList'
 import RecommendationsPanel from '@/components/esg/RecommendationsPanel'
 
+export const dynamic = 'force-dynamic'
+
 export default function ESGPage() {
   return (
     <div className="space-y-6">

@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { api } from '@/lib/api'
 import { useAuth } from '@/hooks/useAuth'
@@ -186,4 +188,3 @@ export default function SettingsPage() {
     </div>
   )
 }
-

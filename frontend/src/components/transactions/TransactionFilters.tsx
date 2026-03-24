@@ -36,7 +36,7 @@ export default function TransactionFilters({ accounts, onFilterChange }: Transac
   }
 
   const clearFilters = () => {
-    const cleared = {
+    const cleared: FilterState = {
       search: '',
       accountId: '',
       category: '',
@@ -164,4 +164,3 @@ export default function TransactionFilters({ accounts, onFilterChange }: Transac
     </div>
   )
 }
-

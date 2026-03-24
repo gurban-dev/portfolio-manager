@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, BarChart3, Bell, ShieldCheck } from 'lucide-react'

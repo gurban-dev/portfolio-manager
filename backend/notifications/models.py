@@ -42,5 +42,5 @@ class Notification(models.Model):
     self.save()
 
   def __str__(self):
-    return f"{self.user.email} - {self.title}" \
+    return f"{self.user.email_address} - {self.title}" \
            f"({'Read' if self.is_read else 'Unread'})"

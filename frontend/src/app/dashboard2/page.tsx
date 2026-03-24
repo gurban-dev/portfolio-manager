@@ -1,6 +1,8 @@
 import AccountList from '@/features/accounts/AccountList'
 import TransactionList from '@/features/transactions/TransactionList'
 
+export const dynamic = 'force-dynamic'
+
 export default function Dashboard() {
   return (
     <div className="space-y-6">
