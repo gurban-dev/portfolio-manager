@@ -9,7 +9,7 @@ urlpatterns = [
 
   # Standard authentication (dj-rest-auth)
   path('api/auth/', include('dj_rest_auth.urls')),
-  path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
+  path('api/auth/registration/', include('users.auth_urls')),
 
   # Google OAuth
   path('api/auth/google/', google_login, name='google_login'),

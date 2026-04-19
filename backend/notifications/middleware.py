@@ -1,16 +1,15 @@
 from urllib.parse import parse_qs
-from channels.middleware import BaseMiddleware
-from channels.db import database_sync_to_async
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
-from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from jwt import decode as jwt_decode
-from django.conf import settings
 import logging
 
+from channels.middleware import BaseMiddleware
+from channels.db import database_sync_to_async
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from jwt import decode as jwt_decode
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.tokens import UntypedToken
+
 logger = logging.getLogger(__name__)
-User = get_user_model()
 
 
 class JWTAuthMiddleware(BaseMiddleware):
@@ -20,6 +19,10 @@ class JWTAuthMiddleware(BaseMiddleware):
     """
     
     async def __call__(self, scope, receive, send):
+        from django.contrib.auth.models import AnonymousUser
+
+        User = get_user_model()
+
         # Extract token from query string
         query_string = scope.get('query_string', b'').decode()
         query_params = parse_qs(query_string)

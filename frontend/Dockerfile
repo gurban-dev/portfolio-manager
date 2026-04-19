@@ -1,4 +1,4 @@
-FROM node:18-alpine AS deps
+FROM node:20-alpine AS deps
 WORKDIR /app
 
 RUN corepack enable
@@ -7,7 +7,7 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
 
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 RUN corepack enable
@@ -23,7 +23,7 @@ ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
 
 RUN pnpm build
 
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production

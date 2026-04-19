@@ -22,5 +22,5 @@ USER appuser
 
 EXPOSE 8000
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "core.asgi:application"]

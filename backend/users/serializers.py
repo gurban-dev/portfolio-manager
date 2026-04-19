@@ -1,8 +1,75 @@
 from rest_framework import serializers
-from dj_rest_auth.registration.serializers import RegisterSerializer
+from allauth.account import app_settings as allauth_account_settings
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email
+from allauth.socialaccount.models import EmailAddress
+from allauth.utils import get_username_max_length
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+signup_email_field = allauth_account_settings.SIGNUP_FIELDS.get('email', {})
+signup_username_field = allauth_account_settings.SIGNUP_FIELDS.get('username', {})
+
+
+class BaseRegisterSerializer(serializers.Serializer):
+  """Local copy of dj-rest-auth registration logic using non-deprecated allauth settings."""
+  username = serializers.CharField(
+    max_length=get_username_max_length(),
+    min_length=allauth_account_settings.USERNAME_MIN_LENGTH,
+    required=bool(signup_username_field.get('required')),
+    allow_blank=not bool(signup_username_field.get('required')),
+  )
+  email = serializers.EmailField(required=bool(signup_email_field.get('required')))
+  password1 = serializers.CharField(write_only=True)
+  password2 = serializers.CharField(write_only=True)
+
+  def validate_username(self, username):
+    return get_adapter().clean_username(username)
+
+  def validate_email(self, email):
+    email = get_adapter().clean_email(email)
+    if allauth_account_settings.UNIQUE_EMAIL:
+      if email and EmailAddress.objects.is_verified(email):
+        raise serializers.ValidationError(
+          'A user is already registered with this e-mail address.',
+        )
+    return email
+
+  def validate_password1(self, password):
+    return get_adapter().clean_password(password)
+
+  def validate(self, data):
+    if data['password1'] != data['password2']:
+      raise serializers.ValidationError("The two password fields didn't match.")
+    return data
+
+  def custom_signup(self, request, user):
+    pass
+
+  def get_cleaned_data(self):
+    return {
+      'username': self.validated_data.get('username', ''),
+      'password1': self.validated_data.get('password1', ''),
+      'email': self.validated_data.get('email', ''),
+    }
+
+  def save(self, request):
+    adapter = get_adapter()
+    user = adapter.new_user(request)
+    self.cleaned_data = self.get_cleaned_data()
+    user = adapter.save_user(request, user, self, commit=False)
+    if 'password1' in self.cleaned_data:
+      try:
+        adapter.clean_password(self.cleaned_data['password1'], user=user)
+      except DjangoValidationError as exc:
+        raise serializers.ValidationError(
+          detail=serializers.as_serializer_error(exc)
+        )
+    user.save()
+    self.custom_signup(request, user)
+    setup_user_email(request, user, [])
+    return user
 
 class UserSerializer(serializers.ModelSerializer):
   """Serializer for user details"""
@@ -27,7 +94,7 @@ class UserSerializer(serializers.ModelSerializer):
     read_only_fields = ['id', 'created_at']
 
 
-class CustomRegisterSerializer(RegisterSerializer):
+class CustomRegisterSerializer(BaseRegisterSerializer):
   """Custom registration serializer with additional fields"""
   first_name = serializers.CharField(required=False, allow_blank=True)
   last_name = serializers.CharField(required=False, allow_blank=True)
@@ -68,6 +135,14 @@ class CustomRegisterSerializer(RegisterSerializer):
           user.email_address = self.cleaned_data.get('email', getattr(user, 'email', ''))
       user.save()
       return user
+
+
+class VerifyEmailSerializer(serializers.Serializer):
+  key = serializers.CharField(write_only=True)
+
+
+class ResendEmailVerificationSerializer(serializers.Serializer):
+  email = serializers.EmailField(required=bool(signup_email_field.get('required')))
 
 
 class GoogleLoginSerializer(serializers.Serializer):
